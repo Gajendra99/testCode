@@ -7,7 +7,7 @@ import 'package:xml2json/xml2json.dart';
 
 class DioHandler extends StatelessWidget {
   final String BaseURL =
-      "http://sam-app-dmz:85/AccuchekServiceSetup/AccuchekMobilityService.svc";
+      "http://15.206.103.207:85/AccuchekServiceSetup/AccuchekMobilityService.svc";
   final String xmlData =
       '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:acc="http://Entity.com/AccuchekMobilityService/">'
       '<soapenv:Header/>'
@@ -28,7 +28,7 @@ class DioHandler extends StatelessWidget {
     try {
       Dio dio = Dio();
       // dio.options.method = 'SEARCH';
-      dio.options.responseType = ResponseType.plain;
+      // dio.options.responseType = ResponseType.plain;
       dio.options.headers = {
         // HttpHeaders.authorizationHeader: basicAuth,
         'content-Type': 'text/xml',
@@ -37,13 +37,16 @@ class DioHandler extends StatelessWidget {
       };
       String data = xmlData;
 
-      Response response = await dio.request(
-          "http://15.206.103.207:85/AccuchekServiceSetup/AccuchekMobilityService.svc",
-          data: data);
+      var response = await dio.request(
+          BaseURL,
+          data: data,
+          options: Options(method: 'POST'),
+        );
+
       xml2json.parse(response.data);
       print(xml2json.toBadgerfish());
     } catch (e) {
-      print(e);
+      print("the Error is : $e");
     }
   }
 
