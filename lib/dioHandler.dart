@@ -1,9 +1,10 @@
 import 'dart:convert';
 import 'dart:io';
-
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:xml2json/xml2json.dart';
+
+import 'get_user_list_online.dart';
 
 class DioHandler extends StatelessWidget {
   final String BaseURL =
@@ -23,7 +24,7 @@ class DioHandler extends StatelessWidget {
       '  </soapenv:Body>'
       '</soapenv:Envelope>';
 
-  void getData() async {
+  Future<GetUserListOnline> getData() async {
     final xml2json = Xml2Json();
     try {
       Dio dio = Dio();
@@ -38,29 +39,40 @@ class DioHandler extends StatelessWidget {
       String data = xmlData;
 
       var response = await dio.request(
-          BaseURL,
-          data: data,
-          options: Options(method: 'POST'),
-        );
+        BaseURL,
+        data: data,
+        options: Options(method: 'POST'),
+      );
 
       xml2json.parse(response.data);
-      print(xml2json.toBadgerfish());
+      return GetUserListOnline.fromJson(jsonDecode(xml2json.toBadgerfish()));
     } catch (e) {
       print("the Error is : $e");
+      throw Exception("$e");
     }
   }
 
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
+    Future<GetUserListOnline> fetchAlbum = getData();
+
     return Scaffold(
       body: SafeArea(
           child: Center(
-        child: ElevatedButton(
-          onPressed: () => getData(),
-          child: Text('Call API'),
-        ),
-      )),
+              child: FutureBuilder<GetUserListOnline>(
+        future: fetchAlbum,
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            return Text(snapshot.data!.responseStatus.toString());
+          } else if (snapshot.hasError) {
+            return Text('${snapshot.error}');
+          }
+
+          // By default, show a loading spinner.
+          return const CircularProgressIndicator();
+        },
+      ))),
     );
   }
 }
