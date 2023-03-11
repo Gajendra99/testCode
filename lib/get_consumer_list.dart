@@ -79,21 +79,6 @@ class GetConsumerList extends StatelessWidget {
     return zipFile.path;
   }
 
-  Future<List<int>> readFileBytes(String filePath) async {
-    final file = File(filePath);
-
-    // Check if the file exists
-    if (!await file.exists()) {
-      throw Exception("File '$filePath' does not exist.");
-    }
-
-    // Read the file contents as bytes
-    final contents = await file.readAsBytes();
-    print("Printing file data \n " + contents.toString());
-
-    return contents;
-  }
-
   Future<void> onClickSFTP() async {
     var zipPath = await createZipFile();
     print("Printing zip file path : $zipPath");
@@ -115,15 +100,12 @@ class GetConsumerList extends StatelessWidget {
     // Decode the zip file into an archive object
     final archive = ZipDecoder().decodeBytes(bytes);
 
-    final directory = await getApplicationDocumentsDirectory();
-    final zipFile = File('${directory.path}/output.bdr');
     // Extract each file from the archive
     String fileData = '';
     for (final file in archive) {
       final filename = file.name;
       final data = file.content as List<int>;
       final fileContent = utf8.decode(data);
-      fileData = fileContent;
       fileReadDataList = fileData;
       isDataChanged(!isDataChanged.value);
       print("Printing file content : \n $fileContent");
