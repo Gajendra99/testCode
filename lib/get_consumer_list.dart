@@ -106,7 +106,7 @@ class GetConsumerList extends StatelessWidget {
       final filename = file.name;
       final data = file.content as List<int>;
       final fileContent = utf8.decode(data);
-      fileReadDataList = fileData;
+      fileReadDataList = fileContent;
       isDataChanged(!isDataChanged.value);
       print("Printing file content : \n $fileContent");
     }
